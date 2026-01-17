@@ -25,8 +25,11 @@ model User {
   accounts      Account[]
 
   // Extends
-  role  USER_ROLE @default(USER)
-  posts Post[]
+  role             USER_ROLE         @default(USER)
+  posts            Post[]
+  postComments     PostComment[]
+  postCommentLikes PostCommentLike[]
+  postLikes        PostLike[]
 
   @@unique([email])
   @@map("user")
@@ -38,17 +41,47 @@ enum USER_ROLE {
   ADMIN
 }
 
+model Category {
+  id             String         @id @default(uuid())
+  name           String         @db.VarChar(100)
+  slug           String         @unique @db.VarChar(100)
+  postCategories PostCategory[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([slug])
+  @@map("categories")
+}
+
+model Tag {
+  id       String    @id @default(uuid())
+  name     String    @unique @db.VarChar(100)
+  postTags PostTag[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([name])
+  @@map("tags")
+}
+
 model Post {
-  id         String      @id @default(uuid())
-  title      String      @db.VarChar(255)
-  content    String      @db.Text
-  thumbnail  String?
-  status     POST_STATUS @default(DRAFT)
-  views      Int         @default(0)
-  owner_id   String
-  owner      User        @relation(fields: [owner_id], references: [id])
-  created_at DateTime    @default(now())
-  updated_at DateTime    @updatedAt
+  id               String            @id @default(uuid())
+  title            String            @db.VarChar(255)
+  content          String            @db.Text
+  thumbnail        String?
+  status           POST_STATUS       @default(DRAFT)
+  views            Int               @default(0)
+  owner_id         String
+  owner            User              @relation(fields: [owner_id], references: [id])
+  postCategory     PostCategory?
+  postTags         PostTag[]
+  postComments     PostComment[]
+  postCommentLikes PostCommentLike[]
+  postLikes        PostLike[]
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
 
   @@index([owner_id])
   @@map("posts")
@@ -58,6 +91,87 @@ enum POST_STATUS {
   DRAFT
   PUBLISHED
   ARCHIVED
+}
+
+model PostCategory {
+  id      String @id @default(uuid())
+  post_id String @unique
+  post    Post   @relation(fields: [post_id], references: [id])
+
+  category_id String
+  category    Category @relation(fields: [category_id], references: [id])
+
+  @@index([post_id])
+  @@map("post_categories")
+}
+
+model PostTag {
+  id      String @id @default(uuid())
+  post_id String
+  post    Post   @relation(fields: [post_id], references: [id])
+
+  tag_id String
+  tag    Tag    @relation(fields: [tag_id], references: [id])
+
+  @@index([post_id])
+  @@map("post_tags")
+}
+
+model PostComment {
+  id               String            @id @default(uuid())
+  post_id          String
+  post             Post              @relation(fields: [post_id], references: [id])
+  user_id          String
+  user             User              @relation(fields: [user_id], references: [id])
+  parent_id        String?
+  parent           PostComment?      @relation("CommentThread", fields: [parent_id], references: [id])
+  replies          PostComment[]     @relation("CommentThread")
+  postCommentLikes PostCommentLike[]
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  @@index([user_id, post_id])
+  @@map("post_comments")
+}
+
+enum LIKE_TYPE {
+  LIKE
+  LOVE
+  SAD
+  HAHA
+  ANGRY
+  CRY
+}
+
+model PostCommentLike {
+  id              String      @id @default(uuid())
+  user_id         String
+  user            User        @relation(fields: [user_id], references: [id])
+  post_comment_id String
+  postComment     PostComment @relation(fields: [post_comment_id], references: [id])
+  post_id         String
+  post            Post        @relation(fields: [post_id], references: [id])
+  type            LIKE_TYPE   @default(LIKE)
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  @@index([post_id, post_comment_id])
+  @@map("post_comment_likes")
+}
+
+model PostLike {
+  id        String    @id @default(uuid())
+  user_id   String
+  user      User      @relation(fields: [user_id], references: [id])
+  post_id   String
+  post      Post      @relation(fields: [post_id], references: [id])
+  type      LIKE_TYPE @default(LIKE)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@index([user_id, post_id])
+  @@map("post_likes")
 }
 
 model Session {
