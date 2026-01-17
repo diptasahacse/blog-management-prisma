@@ -24,8 +24,40 @@ model User {
   sessions      Session[]
   accounts      Account[]
 
+  // Extends
+  role  USER_ROLE @default(USER)
+  posts Post[]
+
   @@unique([email])
   @@map("user")
+}
+
+// User Role
+enum USER_ROLE {
+  USER
+  ADMIN
+}
+
+model Post {
+  id         String      @id @default(uuid())
+  title      String      @db.VarChar(255)
+  content    String      @db.Text
+  thumbnail  String?
+  status     POST_STATUS @default(DRAFT)
+  views      Int         @default(0)
+  owner_id   String
+  owner      User        @relation(fields: [owner_id], references: [id])
+  created_at DateTime    @default(now())
+  updated_at DateTime    @updatedAt
+
+  @@index([owner_id])
+  @@map("posts")
+}
+
+enum POST_STATUS {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
 }
 
 model Session {
