@@ -12,6 +12,11 @@ generator client {
 datasource db {
   provider = "postgresql"
 }
+// role             USER_ROLE         @default(USER)
+//   posts            Post[]
+//   postComments     PostComment[]
+//   postCommentLikes PostCommentLike[]
+//   postLikes        PostLike[]
 
 model User {
   id            String    @id
@@ -25,6 +30,7 @@ model User {
   accounts      Account[]
 
   // Extends
+  phone            String?           @db.VarChar(15)
   role             USER_ROLE         @default(USER)
   posts            Post[]
   postComments     PostComment[]
@@ -32,10 +38,11 @@ model User {
   postLikes        PostLike[]
 
   @@unique([email])
-  @@map("user")
+  @@map("users")
 }
 
 // User Role
+
 enum USER_ROLE {
   USER
   ADMIN
