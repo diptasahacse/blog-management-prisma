@@ -8,6 +8,7 @@ const handleZodValidationError = (error: ZodError): IError[] => {
       message: issue.message,
     };
     const field = issue.path[issue.path.length - 1];
+    console.log(field)
     if (field) {
       errorData.field = field as string;
     }

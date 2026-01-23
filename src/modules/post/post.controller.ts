@@ -1,17 +1,17 @@
 import { Request, Response } from "express";
+import { ICreatePost } from "./post.interface";
 
 const createPost = (req: Request, res: Response) => {
-  console.log(req.user)
+  const {}: ICreatePost = req.body;
 
   res.status(201).json({ message: "Post created successfully" });
 };
 const getPost = (req: Request, res: Response) => {
-
   res.status(201).json({ message: "Post created successfully" });
 };
 
 const postController = {
   createPost,
-  getPost
+  getPost,
 };
 export default postController;

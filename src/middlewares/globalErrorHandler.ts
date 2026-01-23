@@ -3,6 +3,7 @@ import { sendResponse } from "../helpers/sendResponse";
 import { IGenericResponse } from "../types/common";
 import { ZodError } from "zod";
 import handleZodValidationError from "../errors/handleZodValidationError";
+import config from "../config";
 
 const globalErrorHandler: ErrorRequestHandler = (
   err: Error,
@@ -12,8 +13,9 @@ const globalErrorHandler: ErrorRequestHandler = (
 ) => {
   const response: IGenericResponse = {
     success: false,
-    message: "Internal Server Error",
+    message: err.message || "Internal Server Error",
     status: 500,
+    ...(config.is_production && err.stack ? {} : { stack: err.stack }),
   };
   if (err instanceof ZodError) {
     const zodErrors = handleZodValidationError(err);

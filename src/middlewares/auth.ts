@@ -5,7 +5,6 @@ import { UserRoleEnum } from "../modules/user/user.type";
 import { sendResponse } from "../helpers/sendResponse";
 const auth = (...roles: UserRoleEnum[]) => {
   return async (req: Request, res: Response, next: NextFunction) => {
-    console.log("middleware");
     const session = await betterAuth.api.getSession({
       headers: fromNodeHeaders(req.headers),
     });

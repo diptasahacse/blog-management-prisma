@@ -1,4 +1,4 @@
-import postRouter from "../modules/post/post.route";
+import postRouter from "../../modules/post/post.route";
 import { Router } from "express";
 const routes = Router();
 const moduleRoutes = [

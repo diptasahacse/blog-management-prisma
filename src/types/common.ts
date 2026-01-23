@@ -9,4 +9,5 @@ export interface IGenericResponse<T = undefined> {
   status: number;
   data?: T;
   errors?: IError[];
+  stack?: string;
 }

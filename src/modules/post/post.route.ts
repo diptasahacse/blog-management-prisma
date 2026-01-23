@@ -1,21 +1,20 @@
-import { AnyZodObject, ZodSchema } from "zod";
-import { NextFunction, Router } from "express";
+import { Router } from "express";
 import postController from "./post.controller";
 import auth from "../../middlewares/auth";
 import postValidation from "./post.validation";
+import validateRequest from "../../middlewares/validateRequest";
 
 const postRouter = Router();
 const { createPost, getPost } = postController;
 const { createPostValidation } = postValidation;
-const test = () => {
-  return async (req, res, next:NextFunction) => {
-    await createPostValidation.parseAsync({});
-    next();
-  };
-};
 
 // Define your post routes here
-postRouter.post("/", auth(), test(), createPost);
+postRouter.post(
+  "/",
+  auth(),
+  validateRequest(createPostValidation, "body"),
+  createPost,
+);
 postRouter.get("/", getPost);
 
 export default postRouter;
