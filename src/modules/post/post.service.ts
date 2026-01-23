@@ -20,3 +20,4 @@ export const create = async (data: ICreatePost) => {
 const postService = {
   create,
 };
+export default postService;

@@ -8,6 +8,8 @@ export const PostStatus = {
 export type PostStatusEnum = (typeof PostStatus)[keyof typeof PostStatus];
 
 // add {owner_id: string} to ICreatePost
-export type ICreatePost = z.infer<
+export type ICreatePostRequest = z.infer<
   typeof postValidation.createPostValidation
-> & { owner_id: string };
+>;
+
+export type ICreatePost = ICreatePostRequest & { owner_id: string };
