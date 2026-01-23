@@ -27,6 +27,7 @@ export const auth = betterAuth({
   },
   emailVerification: {
     sendOnSignUp: true,
+    autoSignInAfterVerification: true,
     sendVerificationEmail: async ({ token, user }) => {
       try {
         await transporter.sendMail({
@@ -187,10 +188,19 @@ export const auth = betterAuth({
 </html>
 `, // HTML version of the message
         });
-      } catch (error:any) {
+      } catch (error: any) {
         console.log(error);
         throw new Error("Failed to send verification email", error);
       }
+    },
+  },
+  baseURL: config.better_auth_url,
+  socialProviders: {
+    google: {
+      accessType: "offline",
+      prompt: "select_account consent",
+      clientId: config.google_client_id,
+      clientSecret: config.google_client_secret,
     },
   },
   user: {
