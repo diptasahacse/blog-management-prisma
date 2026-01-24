@@ -4,6 +4,7 @@ import postCommentRouter from "../../modules/postComment/postComment.route";
 import categoryRouter from "../../modules/category/category.route";
 import postCommentLikeRouter from "../../modules/postCommentLike/postCommentLike.route";
 import postLikeRouter from "../../modules/postLike/postLike.route";
+import tagRouter from "../../modules/tag/tag.route";
 const routes = Router();
 const moduleRoutes = [
   {
@@ -17,6 +18,10 @@ const moduleRoutes = [
   {
     path: "/categories",
     routes: categoryRouter,
+  },
+  {
+    path: "/tags",
+    routes: tagRouter,
   },
   {
     path: "/post-comment-likes",
