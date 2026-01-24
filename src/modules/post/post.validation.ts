@@ -1,6 +1,5 @@
 import z from "zod";
-import { PostStatus } from "./post.interface";
-
+import { PostStatus } from "./post.enum";
 const createPostValidation = z.object({
   title: z.string({
     message: "title is required",

@@ -129,7 +129,7 @@ model PostComment {
   parent    PostComment?  @relation("CommentThread", fields: [parent_id], references: [id])
   replies   PostComment[] @relation("CommentThread")
 
-  comment          String            @db.Text
+  comment          String              @db.Text
   status           POST_COMMENT_STATUS @default(ENABLED)
   postCommentLikes PostCommentLike[]
 

@@ -1,7 +1,7 @@
 import z from "zod";
 import { prisma } from "../../lib/prisma";
-import { PostStatus } from "../post/post.interface";
-import { PostCommentStatus } from "./postComment.interface";
+import { PostCommentStatus } from "./postComment.enum";
+import { PostStatus } from "../post/post.enum";
 const createPostCommentValidation = z
   .object({
     post_id: z.string({
