@@ -3,6 +3,7 @@ import { Router } from "express";
 import postCommentRouter from "../../modules/postComment/postComment.route";
 import categoryRouter from "../../modules/category/category.route";
 import postCommentLikeRouter from "../../modules/postCommentLike/postCommentLike.route";
+import postLikeRouter from "../../modules/postLike/postLike.route";
 const routes = Router();
 const moduleRoutes = [
   {
@@ -20,7 +21,11 @@ const moduleRoutes = [
   {
     path: "/post-comment-likes",
     routes: postCommentLikeRouter,
-  }
+  },
+  {
+    path: "/post-likes",
+    routes: postLikeRouter,
+  },
 ];
 moduleRoutes.forEach((moduleRoute) => {
   routes.use(moduleRoute.path, moduleRoute.routes);
