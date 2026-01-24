@@ -8,9 +8,9 @@ const createPostValidation = z.object({
   thumbnail: z.string().optional(),
   status: z
     .enum(Object.values(PostStatus), {
-      message: `Invalid status value. Allowed values are: ${Object.values(PostStatus).join(
-        ", "
-      )}`,
+      message: `Invalid status value. Allowed values are: ${Object.values(
+        PostStatus,
+      ).join(", ")}`,
     })
     .optional(),
 });
