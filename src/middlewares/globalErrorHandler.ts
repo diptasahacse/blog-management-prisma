@@ -4,6 +4,7 @@ import { IGenericResponse } from "../types/common";
 import { ZodError } from "zod";
 import handleZodValidationError from "../errors/handleZodValidationError";
 import config from "../config";
+import { CustomError } from "../errors/CustomError";
 
 const globalErrorHandler: ErrorRequestHandler = (
   err: Error,
@@ -24,6 +25,10 @@ const globalErrorHandler: ErrorRequestHandler = (
       response.status = 400;
       response.errors = zodErrors;
     }
+  }
+  if (err instanceof CustomError) {
+    response.status = err.code;
+    response.message = err.message;
   }
 
   return sendResponse(res, response);
