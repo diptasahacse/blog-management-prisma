@@ -1,7 +1,9 @@
+import { PostWhereInput } from "../../../generated/prisma/models";
 import { prisma } from "../../lib/prisma";
+import { PostQueryType, PostStatus } from "./post.enum";
 import { ICreatePost } from "./post.interface";
 
-export const create = async (data: ICreatePost) => {
+const create = async (data: ICreatePost) => {
   const { content, title, thumbnail, status, owner_id } = data;
   try {
     return await prisma.post.create({
@@ -17,7 +19,89 @@ export const create = async (data: ICreatePost) => {
     throw error;
   }
 };
+const getPosts = async (query: PostQueryType) => {
+  const { search, title, status, owner_id, id } = query;
+
+  const andConditions: PostWhereInput[] = [];
+
+  // Search
+  if (search) {
+    andConditions.push({
+      OR: [
+        {
+          title: {
+            contains: search as string,
+            mode: "insensitive",
+          },
+        },
+        {
+          content: {
+            contains: search as string,
+            mode: "insensitive",
+          },
+        },
+        {
+          postComments: {
+            some: {
+              comment: {
+                contains: search as string,
+                mode: "insensitive",
+              },
+            },
+          },
+        },
+      ],
+    });
+  }
+
+  // Title search
+  if (title) {
+    andConditions.push({
+      title: {
+        contains: title as string,
+        mode: "insensitive",
+      },
+    });
+  }
+  // status
+  if (status && Object.values(PostStatus).includes(status)) {
+    andConditions.push({
+      status,
+    });
+  }
+
+  //  Owner id
+  if (owner_id) {
+    andConditions.push({
+      owner_id: {
+        contains: owner_id,
+        mode: "insensitive",
+      },
+    });
+  }
+
+  //  id
+  if (id) {
+    andConditions.push({
+      id: {
+        contains: id,
+        mode: "insensitive",
+      },
+    });
+  }
+
+  return await prisma.post.findMany({
+    where: {
+      AND: andConditions,
+    },
+    include: {
+      postComments: true,
+      categories: true,
+    },
+  });
+};
 const postService = {
   create,
+  getPosts,
 };
 export default postService;

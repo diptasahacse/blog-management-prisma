@@ -15,6 +15,6 @@ postRouter.post(
   validateRequest(createPostValidation, "body"),
   createPost,
 );
-postRouter.get("/", getPost);
+postRouter.get("/", auth(), getPost);
 
 export default postRouter;
