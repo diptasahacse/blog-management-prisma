@@ -5,4 +5,5 @@ export interface IPaginationQuery {
 export interface IPaginationResponse {
   page: number;
   limit: number;
+  total: number;
 }

@@ -1,4 +1,5 @@
 import { IPaginationResponse } from "./pagination";
+import { ISortedDataResponse } from "./sorting";
 
 export interface IError {
   field?: string;
@@ -13,4 +14,5 @@ export interface IGenericResponse<T = undefined> {
   errors?: IError[];
   stack?: string;
   pagination?: IPaginationResponse;
+  sort?: ISortedDataResponse;
 }

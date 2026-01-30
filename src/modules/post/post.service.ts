@@ -1,7 +1,7 @@
 import { PostWhereInput } from "../../../generated/prisma/models";
 import { paginationSortingHelper } from "../../helpers/paginationSortingHelper";
 import { prisma } from "../../lib/prisma";
-import {  PostSortFields, PostStatus } from "./post.enum";
+import { PostSortFields, PostStatus } from "./post.enum";
 import { ICreatePost, PostQueryType } from "./post.interface";
 
 const create = async (data: ICreatePost) => {
@@ -32,14 +32,6 @@ const getPosts = async (query: PostQueryType) => {
     sort_by,
     sort_order,
   } = query;
-  const paginationSortData = paginationSortingHelper({
-    allowedFields: Object.values(PostSortFields),
-    defaultSortBy: PostSortFields.CREATED_AT,
-    sort_by,
-    sort_order,
-    limit,
-    page,
-  });
 
   const andConditions: PostWhereInput[] = [];
 
@@ -108,21 +100,46 @@ const getPosts = async (query: PostQueryType) => {
       },
     });
   }
-
-  return await prisma.post.findMany({
+  const total = await prisma.post.count({
     where: {
       AND: andConditions,
     },
-    include: {
-      postComments: true,
-      categories: true,
-    },
-    orderBy: {
-      [paginationSortData.sort_by]: paginationSortData.sort_order,
-    },
-    take: paginationSortData.take,
-    skip: paginationSortData.skip,
   });
+
+  const paginationSortData = paginationSortingHelper({
+    allowedFields: Object.values(PostSortFields),
+    defaultSortBy: PostSortFields.CREATED_AT,
+    sort_by,
+    sort_order,
+    limit,
+    page,
+  });
+
+  return {
+    data: await prisma.post.findMany({
+      where: {
+        AND: andConditions,
+      },
+      include: {
+        postComments: true,
+        categories: true,
+      },
+      orderBy: {
+        [paginationSortData.sort_by]: paginationSortData.sort_order,
+      },
+      take: paginationSortData.take,
+      skip: paginationSortData.skip,
+    }),
+    pagination: {
+      total: total,
+      limit: paginationSortData.take,
+      page: paginationSortData.page,
+    },
+    sort: {
+      sort_by: paginationSortData.sort_by,
+      sort_order: paginationSortData.sort_order,
+    },
+  };
 };
 const postService = {
   create,

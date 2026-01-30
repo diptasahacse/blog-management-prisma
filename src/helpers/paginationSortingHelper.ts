@@ -23,9 +23,7 @@ export const handleSorting = ({
   ) {
     res.sort_by = sort_by;
     res.sort_order = sort_order as SortOrderEnum;
-  }
-
-  if (
+  }else if (
     sort_order &&
     Object.values(SortOrder).includes(sort_order as SortOrderEnum)
   ) {
@@ -41,7 +39,7 @@ export const handlePagination = ({
 }: {
   page: number | undefined;
   limit: number | undefined;
-}): { skip: number; take: number } => {
+}): { skip: number; take: number; page: number } => {
   const pageLimit = () => {
     if (limit && !isNaN(Number(limit))) {
       if (limit < defaultPaginationValue.minLimit) {
@@ -69,6 +67,7 @@ export const handlePagination = ({
   return {
     take: pageLimit(),
     skip,
+    page: pageData(),
   };
 };
 
@@ -84,9 +83,14 @@ export const paginationSortingHelper = ({
   skip: number;
   take: number;
   sort_order: SortOrderEnum;
+  page: number;
   sort_by: string;
 } => {
-  const { take, skip } = handlePagination({
+  const {
+    take,
+    skip,
+    page: paginationPage,
+  } = handlePagination({
     page,
     limit,
   });
@@ -103,5 +107,6 @@ export const paginationSortingHelper = ({
     skip,
     sort_by: sortData.sort_by,
     sort_order: sortData.sort_order,
+    page: paginationPage,
   };
 };

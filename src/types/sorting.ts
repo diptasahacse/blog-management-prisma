@@ -9,3 +9,7 @@ export interface ISortingQuery {
   sort_by?: string | undefined;
   sort_order?: string | undefined;
 }
+export interface ISortedDataResponse {
+  sort_by: string;
+  sort_order: SortOrderEnum;
+}
