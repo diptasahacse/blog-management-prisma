@@ -134,6 +134,7 @@ const getPosts = async (query: PostQueryType) => {
       total: total,
       limit: paginationSortData.take,
       page: paginationSortData.page,
+      total_pages: Math.ceil(total/paginationSortData.take)
     },
     sort: {
       sort_by: paginationSortData.sort_by,
