@@ -1,6 +1,6 @@
 export interface IPaginationQuery {
-  page?: number;
-  limit?: number;
+  page?: number | undefined;
+  limit?: number | undefined;
 }
 export interface IPaginationResponse {
   page: number;
