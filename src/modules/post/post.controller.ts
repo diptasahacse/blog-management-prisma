@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import { ICreatePostRequest } from "./post.interface";
 import postService from "./post.service";
 import { sendResponse } from "../../helpers/sendResponse";
-const { create, getPosts } = postService;
+const { create, getPosts, getPostById } = postService;
 const createPost = async (req: Request, res: Response, next: NextFunction) => {
   const { content, title, thumbnail, status }: ICreatePostRequest = req.body;
   const { id } = req.user!;
@@ -43,9 +43,41 @@ const getPost = async (req: Request, res: Response) => {
     });
   }
 };
-
+const getPostBuyId = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const { postId } = req.params;
+    if (!postId) {
+      return sendResponse(res, {
+        status: 400,
+        success: false,
+        message: "Post id is required",
+      });
+    }
+    const result = await getPostById(postId as string);
+    if (!result) {
+      return sendResponse(res, {
+        status: 404,
+        success: false,
+        message: "Post not found",
+      });
+    }
+    return sendResponse(res, {
+      status: 200,
+      success: true,
+      message: "Post successfully retrieved",
+      data: result,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
 const postController = {
   createPost,
   getPost,
+  getPostBuyId,
 };
 export default postController;

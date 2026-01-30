@@ -134,7 +134,7 @@ const getPosts = async (query: PostQueryType) => {
       total: total,
       limit: paginationSortData.take,
       page: paginationSortData.page,
-      total_pages: Math.ceil(total/paginationSortData.take)
+      total_pages: Math.ceil(total / paginationSortData.take),
     },
     sort: {
       sort_by: paginationSortData.sort_by,
@@ -142,8 +142,33 @@ const getPosts = async (query: PostQueryType) => {
     },
   };
 };
+const getPostById = async (id: string) => {
+  try {
+    const post = await prisma.post.findUnique({
+      where: {
+        id,
+      },
+    });
+    if (post) {
+      return await prisma.post.update({
+        where: {
+          id: post.id,
+        },
+        data: {
+          views: {
+            increment: 1
+          }
+        },
+      });
+    }
+    return null;
+  } catch (error) {
+    throw new Error("Failed");
+  }
+};
 const postService = {
   create,
   getPosts,
+  getPostById,
 };
 export default postService;

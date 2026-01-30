@@ -5,7 +5,7 @@ import postValidation from "./post.validation";
 import validateRequest from "../../middlewares/validateRequest";
 
 const postRouter = Router();
-const { createPost, getPost } = postController;
+const { createPost, getPost, getPostBuyId } = postController;
 const { createPostValidation } = postValidation;
 
 // Define your post routes here
@@ -16,5 +16,6 @@ postRouter.post(
   createPost,
 );
 postRouter.get("/", auth(), getPost);
+postRouter.get("/:postId", getPostBuyId);
 
 export default postRouter;
