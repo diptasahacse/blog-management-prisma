@@ -1,3 +1,5 @@
+import { IPaginationResponse } from "./pagination";
+
 export interface IError {
   field?: string;
   message: string;
@@ -10,4 +12,5 @@ export interface IGenericResponse<T = undefined> {
   data?: T;
   errors?: IError[];
   stack?: string;
+  pagination?: IPaginationResponse;
 }

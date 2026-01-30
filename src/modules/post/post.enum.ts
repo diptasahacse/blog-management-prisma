@@ -5,10 +5,9 @@ export const PostStatus = {
 } as const;
 export type PostStatusEnum = (typeof PostStatus)[keyof typeof PostStatus];
 
-export type PostQueryType = {
-  search?: string;
-  title?: string;
-  status?: PostStatusEnum;
-  owner_id?: string;
-  id?: string;
-};
+export const PostSortFields = {
+  CREATED_AT: "createdAt",
+  STATUS: "status",
+} as const;
+export type PostSortFieldEnum =
+  (typeof PostSortFields)[keyof typeof PostSortFields];

@@ -1,7 +1,9 @@
 import { PostWhereInput } from "../../../generated/prisma/models";
+import handlePagination from "../../helpers/pagination";
+import handleSorting from "../../helpers/sorting";
 import { prisma } from "../../lib/prisma";
-import { PostQueryType, PostStatus } from "./post.enum";
-import { ICreatePost } from "./post.interface";
+import { PostSortFieldEnum, PostSortFields, PostStatus } from "./post.enum";
+import { ICreatePost, PostQueryType } from "./post.interface";
 
 const create = async (data: ICreatePost) => {
   const { content, title, thumbnail, status, owner_id } = data;
@@ -20,7 +22,29 @@ const create = async (data: ICreatePost) => {
   }
 };
 const getPosts = async (query: PostQueryType) => {
-  const { search, title, status, owner_id, id } = query;
+  const {
+    search,
+    title,
+    status,
+    owner_id,
+    id,
+    limit,
+    page,
+    sort_by,
+    sort_order,
+  } = query;
+  const { skip, take } = handlePagination({
+    limit,
+    page,
+  });
+
+  //  Sorting
+  const sortData = handleSorting({
+    allowedFields: Object.values(PostSortFields),
+    defaultSortBy: PostSortFields.CREATED_AT,
+    sort_by,
+    sort_order,
+  });
 
   const andConditions: PostWhereInput[] = [];
 
@@ -98,6 +122,11 @@ const getPosts = async (query: PostQueryType) => {
       postComments: true,
       categories: true,
     },
+    orderBy: {
+      [sortData.sort_by]: sortData.sort_order,
+    },
+    take,
+    skip,
   });
 };
 const postService = {
