@@ -17,10 +17,15 @@ app.use(
 app.all("/api/auth/{*any}", toNodeHandler(auth));
 app.use(express.json());
 
-
 // All API Routes
+app.get("/", (req: Request, res: Response) => {
+  sendResponse(res, {
+    success: true,
+    message: "Welcome to Blog Application",
+    status: 200,
+  });
+});
 app.use("/api/v1", routes);
-
 
 // Global Error Handling Middleware
 app.use(globalErrorHandler);

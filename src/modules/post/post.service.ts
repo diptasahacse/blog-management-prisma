@@ -20,7 +20,7 @@ const create = async (data: ICreatePost) => {
     throw error;
   }
 };
-const getPosts = async (query: PostQueryType) => {
+const getPosts = async (query?: PostQueryType) => {
   const {
     search,
     title,
@@ -31,8 +31,7 @@ const getPosts = async (query: PostQueryType) => {
     page,
     sort_by,
     sort_order,
-  } = query;
-
+  } = query || {};
   const andConditions: PostWhereInput[] = [];
 
   // Search
@@ -115,7 +114,7 @@ const getPosts = async (query: PostQueryType) => {
     page,
   });
 
-  return {
+  return ({
     data: await prisma.post.findMany({
       where: {
         AND: andConditions,
@@ -134,13 +133,12 @@ const getPosts = async (query: PostQueryType) => {
       total: total,
       limit: paginationSortData.take,
       page: paginationSortData.page,
-      total_pages: Math.ceil(total / paginationSortData.take),
     },
     sort: {
       sort_by: paginationSortData.sort_by,
       sort_order: paginationSortData.sort_order,
     },
-  };
+  }).data;
 };
 const getPostById = async (id: string) => {
   try {

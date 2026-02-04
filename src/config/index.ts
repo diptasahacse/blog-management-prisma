@@ -4,6 +4,7 @@ dotenv.config();
 const config = {
   is_production: process.env.NODE_ENV === 'production',
   port: Number(process.env.PORT) ?? 8000,
+  graphQL_port:  4000,
   database_url: process.env.DATABASE_URL!,
   frontend_url: process.env.FRONTEND_URL!,
   better_auth_url: process.env.BETTER_AUTH_URL!,
