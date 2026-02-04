@@ -18,9 +18,7 @@ type Post{
         updatedAt: String
     }
         type PostPagination {
-            total: Int!
-            page: Int!
-            perPage: Int!
+            pagination: Pagination!
             data: [Post]
         }
 

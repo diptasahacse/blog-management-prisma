@@ -8,7 +8,25 @@ export const postResolvers = {
     //   },
     // },
     getPosts: async () => {
-      return await postService.getPosts();
+      const data = await postService.getPosts();
+      return data.data;
+    },
+    getPostPagination: async (
+      parent: any,
+      args: { page: number; perPage: number },
+    ) => {
+      const data = await postService.getPosts({
+        limit: args.perPage,
+        page: args.page,
+      });
+      return {
+        pagination: {
+          page: data.pagination.page,
+          limit: data.pagination.limit,
+          total: data.pagination.total,
+        },
+        data: data.data,
+      };
     },
     // getPost: (parent, args) => {
     //   return prisma.post.findUnique({

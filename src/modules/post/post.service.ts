@@ -138,7 +138,7 @@ const getPosts = async (query?: PostQueryType) => {
       sort_by: paginationSortData.sort_by,
       sort_order: paginationSortData.sort_order,
     },
-  }).data;
+  });
 };
 const getPostById = async (id: string) => {
   try {
