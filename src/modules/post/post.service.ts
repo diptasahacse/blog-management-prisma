@@ -120,7 +120,11 @@ const getPosts = async (query?: PostQueryType) => {
         AND: andConditions,
       },
       include: {
-        postComments: true,
+        postComments: {
+          include: {
+            replies: true,
+          }
+        },
         categories: true,
       },
       orderBy: {

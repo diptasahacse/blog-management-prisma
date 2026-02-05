@@ -1,10 +1,15 @@
+import { prisma } from "../../lib/prisma";
 import postService from "./post.service";
 
 export const postResolvers = {
   Query: {
     // Post: {
     //   user: async (post: any) => {
-    //     return await getPostById(post.id);
+    //     return await prisma.user.findUnique({
+    //       where: {
+    //         id: "4xkkFmjfBWM3A4Kc6s89XtG1HZuAh3d5",
+    //       },
+    //     });
     //   },
     // },
     getPosts: async () => {
