@@ -5,7 +5,7 @@ export const postType = `
           ARCHIVED
       }
 
-type Post{
+type Post {
         id: ID!
         title: String!
         content: String!
@@ -17,13 +17,13 @@ type Post{
         createdAt: String!
         updatedAt: String
     }
-        type PostPagination {
-            pagination: Pagination!
-            data: [Post]
-        }
+    type PostPagination {
+       pagination: Pagination!
+       data: [Post]
+    }
 
 
-    type Query{
+    type Query {
         getPosts: [Post]
         getPost(id: ID!): Post
         getPostPagination(page: Int!, perPage: Int!): PostPagination

@@ -1,17 +1,13 @@
-import { prisma } from "../../lib/prisma";
 import postService from "./post.service";
+import userService from "../user/user.service";
 
 export const postResolvers = {
+  Post: {
+    user: async (post: any) => {
+      return await userService.getUserById(post.owner_id);
+    },
+  },
   Query: {
-    // Post: {
-    //   user: async (post: any) => {
-    //     return await prisma.user.findUnique({
-    //       where: {
-    //         id: "4xkkFmjfBWM3A4Kc6s89XtG1HZuAh3d5",
-    //       },
-    //     });
-    //   },
-    // },
     getPosts: async () => {
       const data = await postService.getPosts();
       return data.data;
@@ -33,12 +29,8 @@ export const postResolvers = {
         data: data.data,
       };
     },
-    // getPost: (parent, args) => {
-    //   return prisma.post.findUnique({
-    //     where: {
-    //       id: args.id,
-    //     },
-    //   });
-    // },
+    getPost: (parent: any, args: any) => {
+      return postService.getPostById(args.id);
+    },
   },
 };

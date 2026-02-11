@@ -32,8 +32,11 @@ const getPost = async (req: Request, res: Response) => {
       status: 200,
       message: "Posts fetched successfully",
       data: data.data,
-      pagination: data.pagination,
-      sort: data.sort,
+      pagination: {
+        limit: data.pagination.limit,
+        page: data.pagination.page,
+        total: data.pagination.total,
+      },
     });
   } catch (error) {
     sendResponse(res, {
