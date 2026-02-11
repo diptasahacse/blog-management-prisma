@@ -114,7 +114,7 @@ const getPosts = async (query?: PostQueryType) => {
     page,
   });
 
-  return ({
+  return {
     data: await prisma.post.findMany({
       where: {
         AND: andConditions,
@@ -123,7 +123,7 @@ const getPosts = async (query?: PostQueryType) => {
         postComments: {
           include: {
             replies: true,
-          }
+          },
         },
         categories: true,
       },
@@ -142,7 +142,7 @@ const getPosts = async (query?: PostQueryType) => {
       sort_by: paginationSortData.sort_by,
       sort_order: paginationSortData.sort_order,
     },
-  });
+  };
 };
 const getPostById = async (id: string) => {
   try {
@@ -158,8 +158,15 @@ const getPostById = async (id: string) => {
         },
         data: {
           views: {
-            increment: 1
-          }
+            increment: 1,
+          },
+        },
+        include: {
+          postComments: {
+            include: {
+              replies: true,
+            },
+          },
         },
       });
     }
