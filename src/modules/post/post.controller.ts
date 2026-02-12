@@ -1,8 +1,12 @@
 import { NextFunction, Request, Response } from "express";
-import { ICreatePostRequest } from "./post.interface";
+import {
+  ICreatePostRequest,
+  IUpdatePostParams,
+  IUpdatePostRequest,
+} from "./post.interface";
 import postService from "./post.service";
 import { sendResponse } from "../../helpers/sendResponse";
-const { create, getPosts, getPostById } = postService;
+const { create, getPosts, getPostById, update } = postService;
 const createPost = async (req: Request, res: Response, next: NextFunction) => {
   const { content, title, thumbnail, status }: ICreatePostRequest = req.body;
   const { id } = req.user!;
@@ -78,9 +82,25 @@ const getPostBuyId = async (
     next(error);
   }
 };
+const updatePost = async (req: Request, res: Response, next: NextFunction) => {
+  const { id } = req.params as IUpdatePostParams;
+  const { id: userId } = req.user!;
+  try {
+    const result = await update(id, userId, req.body);
+    return sendResponse(res, {
+      success: true,
+      status: 200,
+      message: "Post updated successfully",
+      data: result,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
 const postController = {
   createPost,
   getPost,
   getPostBuyId,
+  updatePost,
 };
 export default postController;

@@ -4,6 +4,8 @@ import { ICreatePostRequest } from "./post.interface";
 import { IGraphQLContext } from "../../graphql/graphql.server";
 import { validateAuth } from "../../graphql/graphql.auth";
 import { Post } from "../../../generated/prisma/client";
+import { IGraphqlPostUpdate } from "./post.graphql.interface";
+import { GraphQLError } from "graphql/error";
 
 export const postResolvers = {
   Post: {
@@ -38,7 +40,7 @@ export const postResolvers = {
     },
   },
   Mutation: {
-    createPost: async(
+    createPost: async (
       parent: any,
       args: { input: ICreatePostRequest },
       context: IGraphQLContext,
@@ -48,6 +50,28 @@ export const postResolvers = {
         ...args.input,
         owner_id: context.user?.id as string,
       });
+    },
+    updatePost: async (
+      parent: any,
+      args: { input: IGraphqlPostUpdate },
+      context: IGraphQLContext,
+    ) => {
+      validateAuth(context);
+      const { id, ...updateData } = args.input;
+      const post = await postService.getPost(id);
+      if (!post) {
+        throw new GraphQLError("Post not found", {
+          extensions: {
+            code: "POST_NOT_FOUND",
+            statusCode: 404,
+          },
+        });
+      }
+      return await postService.update(
+        id,
+        context.user?.id as string,
+        updateData,
+      );
     },
   },
 };

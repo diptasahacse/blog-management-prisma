@@ -1,8 +1,10 @@
+import { Post } from "../../../generated/prisma/client";
 import { PostWhereInput } from "../../../generated/prisma/models";
+import { CustomError } from "../../errors/CustomError";
 import { paginationSortingHelper } from "../../helpers/paginationSortingHelper";
 import { prisma } from "../../lib/prisma";
 import { PostSortFields, PostStatus } from "./post.enum";
-import { ICreatePost, PostQueryType } from "./post.interface";
+import { ICreatePost, IUpdatePost, PostQueryType } from "./post.interface";
 
 const create = async (data: ICreatePost) => {
   const { content, title, thumbnail, status, owner_id } = data;
@@ -175,9 +177,65 @@ const getPostById = async (id: string) => {
     throw new Error("Failed");
   }
 };
+const getPost = async (id: string) => {
+  try {
+    return await prisma.post.findUnique({
+      where: {
+        id,
+      },
+    });
+  } catch (error) {
+    throw new Error("Failed");
+  }
+};
+
+const update = async (id: string, userId: string, data: IUpdatePost) => {
+  try {
+    const post = await prisma.post.findUnique({
+      where: {
+        id,
+        owner_id: userId,
+      },
+    });
+    if (!post) {
+      throw new CustomError("Post not found", 404);
+    }
+
+    const { content, status, thumbnail, title } = data;
+
+    const updateData: IUpdatePost = {};
+    if (title) {
+      updateData.title = title;
+    }
+    if (thumbnail) {
+      updateData.thumbnail = thumbnail;
+    }
+    if (status) {
+      updateData.status = status;
+    }
+    if (content) {
+      updateData.content = content;
+    }
+
+    if (Object.entries(updateData).length > 0) {
+      return await prisma.post.update({
+        where: {
+          id: id,
+        },
+        data: updateData as any,
+      });
+    }
+    return null;
+  } catch (error) {
+    throw new Error("Failed");
+  }
+};
+
 const postService = {
   create,
   getPosts,
   getPostById,
+  update,
+  getPost,
 };
 export default postService;

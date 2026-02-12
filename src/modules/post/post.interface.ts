@@ -8,6 +8,10 @@ import { ISortingQuery } from "../../types/sorting";
 export type ICreatePostRequest = z.infer<
   typeof postValidation.createPostValidation
 >;
+export type IUpdatePostRequest = Partial<ICreatePostRequest>;
+export type IUpdatePostParams = {
+  id: string;
+};
 
 export type PostQueryType = {
   search?: string;
@@ -19,3 +23,4 @@ export type PostQueryType = {
   ISortingQuery;
 
 export type ICreatePost = ICreatePostRequest & { owner_id: string };
+export type IUpdatePost = IUpdatePostRequest

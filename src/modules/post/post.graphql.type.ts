@@ -29,18 +29,26 @@ type Post {
         getPostPagination(page: Int!, perPage: Int!): PostPagination
     }
 
-    input createPost{
+    input CreatePost{
         title: String!
         content: String!
         thumbnail: String
         status: PostStatus
     }
-
-    type Mutation{
-        createPost(input: createPost!): Post!
+        
+    input PostUpdate {
+        id: ID!
+        title: String
+        content: String
+        thumbnail: String
+        status: PostStatus
     }
 
-    
+    type Mutation{
+        createPost(input: CreatePost!): Post!
+        updatePost(input: PostUpdate!): Post!
+    }
+
 
   
 `;
