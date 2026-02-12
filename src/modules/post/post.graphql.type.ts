@@ -29,4 +29,5 @@ type Post {
         getPostPagination(page: Int!, perPage: Int!): PostPagination
     }
 
+  
 `;
