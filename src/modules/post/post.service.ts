@@ -18,11 +18,15 @@ const create = async (data: ICreatePost) => {
         ...(thumbnail ? { thumbnail } : {}),
         ...(status ? { status } : {}),
         owner_id,
-        categories: {
-          create: (categories || []).map((category) => ({
-            category_id: category,
-          })),
-        },
+        ...(categories && categories?.length > 0
+          ? {
+              categories: {
+                create: (categories || []).map((category) => ({
+                  category_id: category,
+                })),
+              },
+            }
+          : {}),
       },
       include: {
         categories: true,
