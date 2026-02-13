@@ -2,6 +2,7 @@ import z from "zod";
 import { prisma } from "../../lib/prisma";
 import { PostCommentStatus } from "./postComment.enum";
 import { PostStatus } from "../post/post.enum";
+import postCommentService from "./postComment.service";
 const createPostCommentValidation = z
   .object({
     post_id: z.string({
@@ -52,7 +53,25 @@ const createPostCommentValidation = z
       }
     }
   });
+const getCommentParamsValidation = z
+  .object({
+    id: z.string({
+      message: "comment id is required",
+    }),
+  })
+  .superRefine(async (data, ctx) => {
+    // Validate comment id exists
+    const comment = await postCommentService.getById(data.id);
+    if (!comment) {
+      ctx.addIssue({
+        path: ["id"],
+        message: "Invalid comment id",
+        code: "custom",
+      });
+    }
+  });
 const postCommentValidation = {
   createPostCommentValidation,
+  getCommentParamsValidation
 };
 export default postCommentValidation;

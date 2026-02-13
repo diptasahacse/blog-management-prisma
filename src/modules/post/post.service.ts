@@ -3,6 +3,8 @@ import { PostWhereInput } from "../../../generated/prisma/models";
 import { CustomError } from "../../errors/CustomError";
 import { paginationSortingHelper } from "../../helpers/paginationSortingHelper";
 import { prisma } from "../../lib/prisma";
+import { SortOrder } from "../../types/sorting";
+import { PostCommentStatus } from "../postComment/postComment.enum";
 import { PostSortFields, PostStatus } from "./post.enum";
 import { ICreatePost, IUpdatePost, PostQueryType } from "./post.interface";
 
@@ -123,11 +125,33 @@ const getPosts = async (query?: PostQueryType) => {
       },
       include: {
         postComments: {
+          where: {
+            parent_id: null,
+            status: PostCommentStatus.ENABLED,
+          },
+          orderBy: {
+            created_at: SortOrder.DESC,
+          },
           include: {
-            replies: true,
+            replies: {
+              where: {
+                status: PostCommentStatus.ENABLED,
+              }
+            },
+            _count: {
+              select: {
+                replies: true,
+              },
+            },
           },
         },
         categories: true,
+        _count: {
+          select: {
+            postComments: true,
+            categories: true,
+          },
+        },
       },
       orderBy: {
         [paginationSortData.sort_by]: paginationSortData.sort_order,

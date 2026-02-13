@@ -6,7 +6,7 @@ import {
 import postCommentService from "./postComment.service";
 import { sendResponse } from "../../helpers/sendResponse";
 
-const { create } = postCommentService;
+const { create, getById } = postCommentService;
 
 const createPostComment = async (
   req: Request,
@@ -33,8 +33,28 @@ const createPostComment = async (
   }
 };
 
+const getCommentById = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const { id } = req.params;
+    const result = await getById(id as string);
+    sendResponse(res, {
+      message: "Post comment fetched",
+      status: 200,
+      success: true,
+      data: result,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 const postCommentController = {
   createPostComment,
+  getCommentById,
 };
 
 export default postCommentController;
