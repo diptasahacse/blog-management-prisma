@@ -53,7 +53,7 @@ const createPostCommentValidation = z
       }
     }
   });
-const getCommentParamsValidation = z
+const commentParamsValidation = z
   .object({
     id: z.string({
       message: "comment id is required",
@@ -72,6 +72,6 @@ const getCommentParamsValidation = z
   });
 const postCommentValidation = {
   createPostCommentValidation,
-  getCommentParamsValidation
+  commentParamsValidation
 };
 export default postCommentValidation;

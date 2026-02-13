@@ -6,7 +6,7 @@ import {
 import postCommentService from "./postComment.service";
 import { sendResponse } from "../../helpers/sendResponse";
 
-const { create, getById } = postCommentService;
+const { create, getById, getComments, deleteComment } = postCommentService;
 
 const createPostComment = async (
   req: Request,
@@ -51,10 +51,47 @@ const getCommentById = async (
     next(error);
   }
 };
+const getPostComments = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const result = await getComments(req.query);
+    sendResponse(res, {
+      message: "Post comments fetched",
+      status: 200,
+      success: true,
+      data: result.data,
+      pagination: result.pagination,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+const deletePostComment = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const { id } = req.params;
+    await deleteComment(id as string);
+    sendResponse(res, {
+      message: "Post deleted",
+      status: 200,
+      success: true,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
 
 const postCommentController = {
   createPostComment,
   getCommentById,
+  getPostComments,
+  deletePostComment,
 };
 
 export default postCommentController;

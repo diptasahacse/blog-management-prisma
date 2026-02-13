@@ -122,11 +122,11 @@ model PostTag {
 model PostComment {
   id        String        @id @default(uuid())
   post_id   String
-  post      Post          @relation(fields: [post_id], references: [id])
+  post      Post          @relation(fields: [post_id], references: [id], onDelete: Cascade)
   user_id   String
-  user      User          @relation(fields: [user_id], references: [id])
+  user      User          @relation(fields: [user_id], references: [id], onDelete: Cascade)
   parent_id String?
-  parent    PostComment?  @relation("CommentThread", fields: [parent_id], references: [id])
+  parent    PostComment?  @relation("CommentThread", fields: [parent_id], references: [id], onDelete: Cascade)
   replies   PostComment[] @relation("CommentThread")
 
   comment          String              @db.Text
@@ -157,11 +157,11 @@ enum LIKE_TYPE {
 model PostCommentLike {
   id              String      @id @default(uuid())
   user_id         String
-  user            User        @relation(fields: [user_id], references: [id])
+  user            User        @relation(fields: [user_id], references: [id], onDelete: Cascade)
   post_comment_id String
-  postComment     PostComment @relation(fields: [post_comment_id], references: [id])
+  postComment     PostComment @relation(fields: [post_comment_id], references: [id], onDelete: Cascade)
   post_id         String
-  post            Post        @relation(fields: [post_id], references: [id])
+  post            Post        @relation(fields: [post_id], references: [id], onDelete: Cascade)
   type            LIKE_TYPE   @default(LIKE)
   createdAt       DateTime    @default(now())
   updatedAt       DateTime    @updatedAt

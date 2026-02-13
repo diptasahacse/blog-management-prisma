@@ -1,3 +1,5 @@
+import { CommonSortFields } from "../../types/sorting";
+
 export const PostStatus = {
   DRAFT: "DRAFT",
   PUBLISHED: "PUBLISHED",
@@ -6,7 +8,7 @@ export const PostStatus = {
 export type PostStatusEnum = (typeof PostStatus)[keyof typeof PostStatus];
 
 export const PostSortFields = {
-  CREATED_AT: "createdAt",
+  ...CommonSortFields,
   STATUS: "status",
 } as const;
 export type PostSortFieldEnum =

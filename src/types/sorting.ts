@@ -5,6 +5,10 @@ export const SortOrder = {
 
 export type SortOrderEnum = (typeof SortOrder)[keyof typeof SortOrder];
 
+export const CommonSortFields = {
+  CREATED_AT: "createdAt",
+} as const;
+
 export interface ISortingQuery {
   sort_by?: string | undefined;
   sort_order?: string | undefined;
