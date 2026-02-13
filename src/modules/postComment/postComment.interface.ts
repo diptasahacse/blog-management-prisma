@@ -3,9 +3,11 @@ import postCommentValidation from "./postComment.validation";
 import { ICommonUserIdPayload } from "../user/user.interface";
 import { IPaginationQuery } from "../../types/pagination";
 import { ISortingQuery } from "../../types/sorting";
-const { createPostCommentValidation } = postCommentValidation;
+const { createPostCommentValidation, updatePostCommentValidation } =
+  postCommentValidation;
 
 export type IPostCommentRequest = z.infer<typeof createPostCommentValidation>;
+export type IUpdateCommentRequest = z.infer<typeof updatePostCommentValidation>;
 export type IPostCommentCreatePayload = IPostCommentRequest &
   ICommonUserIdPayload;
 

@@ -53,6 +53,20 @@ const createPostCommentValidation = z
       }
     }
   });
+const updatePostCommentValidation = z.object({
+  comment: z
+    .string()
+    .min(2, "comment must be at least 2 characters long")
+    .optional(),
+  status: z
+    .enum(Object.values(PostCommentStatus), {
+      message: `Invalid status value. Allowed values are: ${Object.values(
+        PostCommentStatus,
+      ).join(", ")}`,
+    })
+    .optional(),
+});
+
 const commentParamsValidation = z
   .object({
     id: z.string({
@@ -72,6 +86,7 @@ const commentParamsValidation = z
   });
 const postCommentValidation = {
   createPostCommentValidation,
-  commentParamsValidation
+  commentParamsValidation,
+  updatePostCommentValidation,
 };
 export default postCommentValidation;

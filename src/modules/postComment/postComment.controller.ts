@@ -5,8 +5,16 @@ import {
 } from "./postComment.interface";
 import postCommentService from "./postComment.service";
 import { sendResponse } from "../../helpers/sendResponse";
+import { USER_ROLES } from "../user/user.type";
 
-const { create, getById, getComments, deleteComment } = postCommentService;
+const {
+  create,
+  getById,
+  getComments,
+  deleteComment,
+  update,
+  getByIdAndUserIdAndValidate,
+} = postCommentService;
 
 const createPostComment = async (
   req: Request,
@@ -24,6 +32,28 @@ const createPostComment = async (
     const result = await create(payload);
     sendResponse(res, {
       message: "Post comment created",
+      status: 201,
+      success: true,
+      data: result,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+const updatePostComment = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const { id } = req.params;
+    const user = req.user;
+    if (user?.role === USER_ROLES.USER) {
+      await getByIdAndUserIdAndValidate(id as string, user.id);
+    }
+    const result = await update(id as string, req.body);
+    sendResponse(res, {
+      message: "Post comment updated",
       status: 201,
       success: true,
       data: result,
@@ -92,6 +122,7 @@ const postCommentController = {
   getCommentById,
   getPostComments,
   deletePostComment,
+  updatePostComment,
 };
 
 export default postCommentController;

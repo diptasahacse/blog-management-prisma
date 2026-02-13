@@ -1,10 +1,15 @@
-import { PostCommentWhereInput } from "../../../generated/prisma/models";
+import {
+  PostCommentUpdateInput,
+  PostCommentWhereInput,
+} from "../../../generated/prisma/models";
+import { CustomError } from "../../errors/CustomError";
 import { paginationSortingHelper } from "../../helpers/paginationSortingHelper";
 import { prisma } from "../../lib/prisma";
 import { CommonSortFields } from "../../types/sorting";
 import {
   IPostCommentCreatePayload,
   IPostCommentQuery,
+  IUpdateCommentRequest,
 } from "./postComment.interface";
 
 const getComments = async ({
@@ -91,6 +96,22 @@ const getById = async (id: string) => {
     throw error;
   }
 };
+const getByIdAndUserIdAndValidate = async (id: string, userId: string) => {
+  try {
+    const comment = await prisma.postComment.findUnique({
+      where: {
+        user_id: userId,
+        id: id,
+      },
+    });
+    if (!comment) {
+      throw new CustomError("Comment not found", 404);
+    }
+    return comment;
+  } catch (error) {
+    throw error;
+  }
+};
 
 const create = async (data: IPostCommentCreatePayload) => {
   try {
@@ -121,10 +142,35 @@ const deleteComment = async (id: string) => {
   }
 };
 
+const update = async (id: string, data: IUpdateCommentRequest) => {
+  try {
+    const { comment, status } = data;
+    const updatedData: PostCommentUpdateInput = {};
+    if (comment) {
+      updatedData.comment = comment;
+    }
+    if (status) {
+      updatedData.status = status;
+    }
+
+    return prisma.postComment.update({
+      where: {
+        id: id,
+      },
+      data: {
+        ...updatedData,
+      },
+    });
+  } catch (error) {
+    throw error;
+  }
+};
 const postCommentService = {
   create,
   getById,
   getComments,
   deleteComment,
+  update,
+  getByIdAndUserIdAndValidate,
 };
 export default postCommentService;
