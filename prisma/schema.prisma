@@ -103,6 +103,9 @@ model PostCategory {
   category_id String
   category    Category @relation(fields: [category_id], references: [id])
 
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   @@index([post_id])
   @@map("post_categories")
 }

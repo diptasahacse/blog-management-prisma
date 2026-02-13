@@ -8,14 +8,10 @@ import postService from "./post.service";
 import { sendResponse } from "../../helpers/sendResponse";
 const { create, getPosts, getPostById, update } = postService;
 const createPost = async (req: Request, res: Response, next: NextFunction) => {
-  const { content, title, thumbnail, status }: ICreatePostRequest = req.body;
   const { id } = req.user!;
   try {
     const result = await create({
-      content,
-      title,
-      thumbnail,
-      status,
+      ...req.body,
       owner_id: id,
     });
     return sendResponse(res, {

@@ -9,17 +9,27 @@ import { PostSortFields, PostStatus } from "./post.enum";
 import { ICreatePost, IUpdatePost, PostQueryType } from "./post.interface";
 
 const create = async (data: ICreatePost) => {
-  const { content, title, thumbnail, status, owner_id } = data;
+  const { content, title, thumbnail, status, owner_id, categories } = data;
   try {
-    return await prisma.post.create({
+    const res = await prisma.post.create({
       data: {
         content,
         title,
         ...(thumbnail ? { thumbnail } : {}),
         ...(status ? { status } : {}),
         owner_id,
+        categories: {
+          create: (categories || []).map((category) => ({
+            category_id: category,
+          })),
+        },
+      },
+      include: {
+        categories: true,
       },
     });
+
+    return res;
   } catch (error) {
     throw error;
   }
@@ -136,7 +146,7 @@ const getPosts = async (query?: PostQueryType) => {
             replies: {
               where: {
                 status: PostCommentStatus.ENABLED,
-              }
+              },
             },
             _count: {
               select: {

@@ -4,7 +4,7 @@ import validateRequest from "../../middlewares/validateRequest";
 import categoryValidation from "./category.validation";
 import categoryController from "./category.controller";
 const { createCategoryValidation } = categoryValidation;
-const { createCategory } = categoryController;
+const { createCategory, getAllCategories } = categoryController;
 const categoryRouter = Router();
 categoryRouter.post(
   "/",
@@ -12,5 +12,6 @@ categoryRouter.post(
   validateRequest(createCategoryValidation, "body"),
   createCategory,
 );
+categoryRouter.get("/", getAllCategories);
 
 export default categoryRouter;
