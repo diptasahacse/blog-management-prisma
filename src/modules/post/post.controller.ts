@@ -1,12 +1,20 @@
 import { NextFunction, Request, Response } from "express";
 import {
-  ICreatePostRequest,
   IUpdatePostParams,
-  IUpdatePostRequest,
 } from "./post.interface";
 import postService from "./post.service";
 import { sendResponse } from "../../helpers/sendResponse";
-const { create, getPosts, getPostById, update } = postService;
+import { CustomError } from "../../errors/CustomError";
+import { USER_ROLES } from "../user/user.type";
+const {
+  create,
+  getPosts,
+  getPostById,
+  update,
+  getPostByIdAndUserId,
+  deletePost,
+  getStats,
+} = postService;
 const createPost = async (req: Request, res: Response, next: NextFunction) => {
   const { id } = req.user!;
   try {
@@ -78,11 +86,23 @@ const getPostBuyId = async (
     next(error);
   }
 };
+
+/**
+ * 1. Owner can only update own post
+ * 2. Admin can update any post
+ */
+
 const updatePost = async (req: Request, res: Response, next: NextFunction) => {
   const { id } = req.params as IUpdatePostParams;
-  const { id: userId } = req.user!;
+  const user = req.user!;
   try {
-    const result = await update(id, userId, req.body);
+    if (user.role === USER_ROLES.USER) {
+      const post = await getPostByIdAndUserId(id, user.id);
+      if (!post) {
+        throw new CustomError("You are not the owner of this post", 404);
+      }
+    }
+    const result = await update(id, req.body);
     return sendResponse(res, {
       success: true,
       status: 200,
@@ -93,10 +113,59 @@ const updatePost = async (req: Request, res: Response, next: NextFunction) => {
     next(error);
   }
 };
+
+/**
+ * 1. Owner can only delete own post
+ * 2. Admin can delete any post
+ */
+
+const deletePostController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  const { id } = req.params as IUpdatePostParams;
+  const user = req.user!;
+  try {
+    if (user.role === USER_ROLES.USER) {
+      const post = await getPostByIdAndUserId(id, user.id);
+      if (!post) {
+        throw new CustomError("You are not the owner of this post", 404);
+      }
+    }
+    await deletePost(id);
+    return sendResponse(res, {
+      success: true,
+      status: 200,
+      message: "Post deleted successfully",
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+const getStatsController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const data = await getStats();
+    return sendResponse(res, {
+      success: true,
+      status: 200,
+      data: data,
+      message: "Post deleted successfully",
+    });
+  } catch (error) {
+    next(error);
+  }
+};
 const postController = {
   createPost,
   getPost,
   getPostBuyId,
   updatePost,
+  deletePostController,
+  getStatsController,
 };
 export default postController;

@@ -1,15 +1,15 @@
-import { Post } from "../../../generated/prisma/client";
 import { PostWhereInput } from "../../../generated/prisma/models";
-import { CustomError } from "../../errors/CustomError";
 import { paginationSortingHelper } from "../../helpers/paginationSortingHelper";
 import { prisma } from "../../lib/prisma";
 import { SortOrder } from "../../types/sorting";
 import { PostCommentStatus } from "../postComment/postComment.enum";
+import { USER_ROLES } from "../user/user.type";
 import { PostSortFields, PostStatus } from "./post.enum";
 import { ICreatePost, IUpdatePost, PostQueryType } from "./post.interface";
 
 const create = async (data: ICreatePost) => {
-  const { content, title, thumbnail, status, owner_id, categories } = data;
+  const { content, title, thumbnail, status, owner_id, categories, tags } =
+    data;
   try {
     const res = await prisma.post.create({
       data: {
@@ -27,9 +27,19 @@ const create = async (data: ICreatePost) => {
               },
             }
           : {}),
+        ...(tags && tags?.length > 0
+          ? {
+              tags: {
+                create: (tags || []).map((tag) => ({
+                  tag_id: tag,
+                })),
+              },
+            }
+          : {}),
       },
       include: {
         categories: true,
+        postTags: true,
       },
     });
 
@@ -160,6 +170,7 @@ const getPosts = async (query?: PostQueryType) => {
           },
         },
         categories: true,
+        postTags: true,
         _count: {
           select: {
             postComments: true,
@@ -226,21 +237,22 @@ const getPost = async (id: string) => {
     throw new Error("Failed");
   }
 };
-
-const update = async (id: string, userId: string, data: IUpdatePost) => {
+const getPostByIdAndUserId = async (id: string, userID: string) => {
   try {
-    const post = await prisma.post.findUnique({
+    return await prisma.post.findUnique({
       where: {
         id,
-        owner_id: userId,
+        owner_id: userID,
       },
     });
-    if (!post) {
-      throw new CustomError("Post not found", 404);
-    }
+  } catch (error) {
+    throw new Error("Failed");
+  }
+};
 
+const update = async (id: string, data: IUpdatePost) => {
+  try {
     const { content, status, thumbnail, title } = data;
-
     const updateData: IUpdatePost = {};
     if (title) {
       updateData.title = title;
@@ -269,11 +281,84 @@ const update = async (id: string, userId: string, data: IUpdatePost) => {
   }
 };
 
+const deletePost = async (id: string) => {
+  try {
+    await prisma.post.delete({
+      where: {
+        id: id,
+      },
+    });
+    return null;
+  } catch (error) {
+    throw error;
+  }
+};
+
+const getStats = async () => {
+  try {
+    // Post count, published post, draft posts,total comments, total views
+    return await prisma.$transaction(async (tnx) => {
+      const [
+        totalPost,
+        totalPublishedPost,
+        totalDraftPost,
+        totalComment,
+        totalViews,
+        totalAdmin,
+        totalUser,
+      ] = await Promise.all([
+        await tnx.post.count(),
+        await tnx.post.count({
+          where: {
+            status: PostStatus.PUBLISHED,
+          },
+        }),
+        await tnx.post.count({
+          where: {
+            status: PostStatus.DRAFT,
+          },
+        }),
+        await tnx.postComment.count(),
+        await tnx.post.aggregate({
+          _sum: {
+            views: true,
+          },
+        }),
+        await tnx.user.count({
+          where: {
+            role: USER_ROLES.ADMIN,
+          },
+        }),
+        await tnx.user.count({
+          where: {
+            role: USER_ROLES.USER,
+          },
+        }),
+      ]);
+
+      return {
+        totalPost,
+        totalPublishedPost,
+        totalDraftPost,
+        totalComment,
+        totalViews: totalViews._sum.views,
+        totalAdmin,
+        totalUser,
+      };
+    });
+  } catch (error) {
+    throw error;
+  }
+};
+
 const postService = {
   create,
   getPosts,
   getPostById,
   update,
   getPost,
+  getPostByIdAndUserId,
+  deletePost,
+  getStats,
 };
 export default postService;

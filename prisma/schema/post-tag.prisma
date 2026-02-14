@@ -1,0 +1,11 @@
+model PostTag {
+    id      String @id @default(uuid())
+    post_id String
+    post    Post   @relation(fields: [post_id], references: [id])
+
+    tag_id String
+    tag    Tag    @relation(fields: [tag_id], references: [id])
+
+    @@index([post_id])
+    @@map("post_tags")
+}

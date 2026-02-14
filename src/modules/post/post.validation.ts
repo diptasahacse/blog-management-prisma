@@ -17,6 +17,12 @@ const createPostValidation = z
         message: "At least one category is required",
       })
       .optional(),
+    tags: z
+      .array(z.string())
+      .min(1, {
+        message: "At least one tag is required",
+      })
+      .optional(),
     thumbnail: z.string().optional(),
     status: z
       .enum(Object.values(PostStatus), {
@@ -29,6 +35,7 @@ const createPostValidation = z
   .superRefine(async (data, ctx) => {
     // check category id exist on database
     const categories = data.categories;
+    const tags = data.tags;
     if (categories) {
       const existCategories = await prisma.category.findMany({
         where: {
@@ -41,6 +48,22 @@ const createPostValidation = z
         ctx.addIssue({
           path: ["categories"],
           message: "Invalid category id",
+          code: "custom",
+        });
+      }
+    }
+    if (tags) {
+      const existTags = await prisma.tag.findMany({
+        where: {
+          id: {
+            in: tags,
+          },
+        },
+      });
+      if (existTags.length !== existTags.length) {
+        ctx.addIssue({
+          path: ["tags"],
+          message: "Invalid tag id",
           code: "custom",
         });
       }
@@ -58,7 +81,7 @@ const updatePostValidation = z.object({
     })
     .optional(),
 });
-const updatePostParamsValidation = z
+const postParamsValidation = z
   .object({
     id: z.string({
       message: "id is required",
@@ -77,6 +100,6 @@ const updatePostParamsValidation = z
 const postValidation = {
   createPostValidation,
   updatePostValidation,
-  updatePostParamsValidation,
+  postParamsValidation,
 };
 export default postValidation;

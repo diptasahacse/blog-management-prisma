@@ -1,0 +1,8 @@
+enum LIKE_TYPE {
+    LIKE
+    LOVE
+    SAD
+    HAHA
+    ANGRY
+    CRY
+}

@@ -1,0 +1,25 @@
+model PostComment {
+    id        String        @id @default(uuid())
+    post_id   String
+    post      Post          @relation(fields: [post_id], references: [id], onDelete: Cascade)
+    user_id   String
+    user      User          @relation(fields: [user_id], references: [id], onDelete: Cascade)
+    parent_id String?
+    parent    PostComment?  @relation("CommentThread", fields: [parent_id], references: [id], onDelete: Cascade)
+    replies   PostComment[] @relation("CommentThread")
+
+    comment          String              @db.Text
+    status           POST_COMMENT_STATUS @default(ENABLED)
+    postCommentLikes PostCommentLike[]
+
+    created_at DateTime @default(now())
+    updated_at DateTime @updatedAt
+
+    @@index([user_id, post_id])
+    @@map("post_comments")
+}
+
+enum POST_COMMENT_STATUS {
+    ENABLED
+    DISABLED
+}

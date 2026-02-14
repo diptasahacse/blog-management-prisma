@@ -5,7 +5,7 @@ import { ZodError } from "zod";
 import handleZodValidationError from "../errors/handleZodValidationError";
 import config from "../config";
 import { CustomError } from "../errors/CustomError";
-
+import { PrismaClientInitializationError, PrismaClientKnownRequestError, PrismaClientRustPanicError, PrismaClientUnknownRequestError, PrismaClientValidationError } from "../../generated/prisma/internal/prismaNamespace";
 const globalErrorHandler: ErrorRequestHandler = (
   err: Error,
   req: Request,
@@ -30,6 +30,22 @@ const globalErrorHandler: ErrorRequestHandler = (
     response.status = err.code;
     response.message = err.message;
   }
+  // //  Handle Prisma Client Errors
+  // const isPrismaError =
+  //   err instanceof PrismaClientKnownRequestError ||
+  //   err instanceof PrismaClientUnknownRequestError ||
+  //   err instanceof PrismaClientRustPanicError ||
+  //   err instanceof PrismaClientInitializationError ||
+  //   err instanceof PrismaClientValidationError;
+  // if (isPrismaError) {
+  //   console.log("dd")
+  //   // const prismaError = handlePrismaError(err);
+  //   // if (prismaError.length) {
+  //   //   response.message = "Database Error";
+  //   //   response.status = 500;
+  //   //   response.errors = prismaError;
+  //   // }
+  // }
 
   return sendResponse(res, response);
 };

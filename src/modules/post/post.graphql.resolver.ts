@@ -69,7 +69,6 @@ export const postResolvers = {
       }
       return await postService.update(
         id,
-        context.user?.id as string,
         updateData,
       );
     },

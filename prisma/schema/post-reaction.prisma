@@ -1,0 +1,13 @@
+model PostLike {
+    id        String    @id @default(uuid())
+    user_id   String
+    user      User      @relation(fields: [user_id], references: [id])
+    post_id   String
+    post      Post      @relation(fields: [post_id], references: [id])
+    type      LIKE_TYPE @default(LIKE)
+    createdAt DateTime  @default(now())
+    updatedAt DateTime  @updatedAt
+
+    @@index([user_id, post_id])
+    @@map("post_likes")
+}
