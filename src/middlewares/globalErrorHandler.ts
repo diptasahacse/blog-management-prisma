@@ -5,7 +5,9 @@ import { ZodError } from "zod";
 import handleZodValidationError from "../errors/handleZodValidationError";
 import config from "../config";
 import { CustomError } from "../errors/CustomError";
-import { PrismaClientInitializationError, PrismaClientKnownRequestError, PrismaClientRustPanicError, PrismaClientUnknownRequestError, PrismaClientValidationError } from "../../generated/prisma/internal/prismaNamespace";
+import { Prisma } from "../../generated/prisma/client";
+import handlePostgresError from "../errors/handlePostgresError";
+import handlePrismaError from "../errors/handlePrismaError";
 const globalErrorHandler: ErrorRequestHandler = (
   err: Error,
   req: Request,
@@ -17,6 +19,7 @@ const globalErrorHandler: ErrorRequestHandler = (
     message: err.message || "Internal Server Error",
     status: 500,
     ...(config.is_production && err.stack ? {} : { stack: err.stack }),
+    ...(config.is_production ? {} : { errorDetails: err }),
   };
   if (err instanceof ZodError) {
     const zodErrors = handleZodValidationError(err);
@@ -30,22 +33,33 @@ const globalErrorHandler: ErrorRequestHandler = (
     response.status = err.code;
     response.message = err.message;
   }
-  // //  Handle Prisma Client Errors
-  // const isPrismaError =
-  //   err instanceof PrismaClientKnownRequestError ||
-  //   err instanceof PrismaClientUnknownRequestError ||
-  //   err instanceof PrismaClientRustPanicError ||
-  //   err instanceof PrismaClientInitializationError ||
-  //   err instanceof PrismaClientValidationError;
-  // if (isPrismaError) {
-  //   console.log("dd")
-  //   // const prismaError = handlePrismaError(err);
-  //   // if (prismaError.length) {
-  //   //   response.message = "Database Error";
-  //   //   response.status = 500;
-  //   //   response.errors = prismaError;
-  //   // }
-  // }
+  //  Handle postgres error
+  const isPostgresError = (err as any).cause?.kind === "postgres";
+  if (isPostgresError) {
+    const postgresErrors = handlePostgresError(err);
+    if (postgresErrors.length) {
+      response.message = "Conflict Error";
+      response.status = 409;
+      response.errors = postgresErrors;
+    }
+  }
+
+  //  Handle Prisma Client Errors
+  const isPrismaError =
+    err instanceof Prisma.PrismaClientKnownRequestError ||
+    err instanceof Prisma.PrismaClientUnknownRequestError ||
+    err instanceof Prisma.PrismaClientRustPanicError ||
+    err instanceof Prisma.PrismaClientInitializationError ||
+    err instanceof Prisma.PrismaClientValidationError;
+
+  if (isPrismaError) {
+    const prismaErrors = handlePrismaError(err);
+    if (prismaErrors.length) {
+      response.message = "Database Error";
+      response.status = 500;
+      response.errors = prismaErrors;
+    }
+  }
 
   return sendResponse(res, response);
 };

@@ -11,5 +11,6 @@ export interface IGenericResponse<T = undefined> {
   data?: T;
   errors?: IError[];
   stack?: string;
+  errorDetails?: unknown;
   pagination?: IPaginationResponse;
 }
